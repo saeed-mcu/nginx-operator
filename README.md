@@ -66,3 +66,15 @@ type NginxOperatorSpec struct {
 Once the Operator types have been modified, it is sometimes necessary to run `make generate` from the project root.
 This updates generated files, such as the zz_generated.deepcopy.go. It is good practice to develop the habit of
 regularly running this command whenever making changes to the API, even if it does not always produce any changes.
+
+## Step 4 : Adding resource manifests
+With the API types defined, it is now possible to generate an equivalent CRD manifest,
+The first step is to generate a CRD from the Go types.
+```bash
+make manifests
+```
+The underlying command for `make manifests` is actually calling an additional tool, `controller-gen`
+Running `controller-gen` manually is an acceptable way to generate files and code in non-default ways.
+
+The `make manifests` command also creates a corresponding **Role-Based Access Control (RBAC)** role
+with can be bound to the Operator's ServiceAccount to give the Operator access to their own custom object.
