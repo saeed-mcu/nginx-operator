@@ -78,3 +78,36 @@ Running `controller-gen` manually is an acceptable way to generate files and cod
 
 The `make manifests` command also creates a corresponding **Role-Based Access Control (RBAC)** role
 with can be bound to the Operator's ServiceAccount to give the Operator access to their own custom object.
+
+### Additional manifests
+The `ClusterRole` can be conveniently generated with `Kubebuilder tags` in the code
+To do that, we need to update the RBAC role for the Operator.
+This can be done automatically using Kubebuilder markers on the Reconcile() function
+```go
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+```
+
+### Using go:embed to access resources
+The `go:embed` marker was included as a compiler directive in Go 1.16 to provide native
+resource embedding without the need for external tools such as `go-bindata`.
+To start with  this approach, create the resource manifest files under a new directory called assets/.
+
+To do this, we will keep the existing assets/ directory (to use as an importable
+Go module path that holds helper functions for loading and processing the files) and place
+a new manifests/ directory underneath it (which will hold the actual manifest files).
+
+
+### what events will trigger this loop to run?
+This is set up in SetupWithManager():
+```go
+func (r *NginxOperatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
+    return ctrl.NewControllerManagedBy(mgr).
+            For(&operatorv1alpha1.NginxOperator{}).
+            Owns(&appsv1.Deployment{}).
+            Complete(r)
+}
+```
+Finally run:
+```bash
+make manifest
+```
