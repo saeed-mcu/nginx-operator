@@ -16,6 +16,8 @@ cd nginx-operator
 Now, initialize a boilerplate project structure with the following:
 
 ```bash
+# we'll use a domain of example.com
+# so all API groups will be <group>.example.com
 operator-sdk init --domain example.com --repo github.com/saeed-mcu/nginx-operator
 ```
 
@@ -23,3 +25,19 @@ operator-sdk init --domain example.com --repo github.com/saeed-mcu/nginx-operato
 
 
 ## STEP2: Defining an API
+The Operator's API will be the definition of how it is represented within a Kubernetes
+cluster. The API is directly translated to a generated CRD, which describes the blueprint
+for the custom resource object that users will consume to interact with the Operator.
+Therefore, creating this API is a necessary first step before writing other logic for the Operator
+Building an Operator API is done by writing a Go struct to represent the object.
+
+```bash
+operator-sdk create api --group operator --version v1alpha1 --kind NginxOperator --resource --controller
+```
+This command does the following:
+1. Creates the API types in a new directory called `api/`
+2. Defines these types as belonging to the API group `operator.example.com`
+3. Creates the initial version of the API named `v1alpha1`
+4. Names these types after our Operator, `NginxOperator`
+5. Instantiates boilerplate controller code under a new directory called `controllers/`
+6. Updates main.go to add boilerplate code for starting the new controller
