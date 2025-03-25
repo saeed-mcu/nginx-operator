@@ -21,17 +21,17 @@ func init() {
 	}
 }
 
-func GetDeploymentFromFile(name string) *appsv1.Deployment {
+func GetDeploymentFromFile(name string) (*appsv1.Deployment, error) {
 	deploymentBytes, err := manifests.ReadFile(name)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	deploymentObject, err := runtime.Decode(
 		appsCodecs.UniversalDecoder(appsv1.SchemeGroupVersion),
 		deploymentBytes,
 	)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return deploymentObject.(*appsv1.Deployment)
+	return deploymentObject.(*appsv1.Deployment), nil
 }

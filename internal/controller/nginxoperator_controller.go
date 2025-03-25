@@ -54,6 +54,8 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	logger := log.FromContext(ctx)
 
+	logger.Info("Start Reconcileing")
+
 	operatorCR := &operatorv1alpha1.NginxOperator{}
 	err := r.Get(ctx, req.NamespacedName, operatorCR)
 	if err != nil && errors.IsNotFound(err) {
@@ -64,12 +66,19 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
+	logger.Info("Operator resource found")
+
 	deployment := &appsv1.Deployment{}
 	create := false
 	err = r.Get(ctx, req.NamespacedName, deployment)
 	if err != nil && errors.IsNotFound(err) {
 		create = true
-		deployment = assets.GetDeploymentFromFile("assets/nginx_deployment.yaml")
+		deployment, err = assets.GetDeploymentFromFile("manifests/nginx_deployment.yaml")
+		if err != nil {
+			logger.Error(err, "Can not get deployment.")
+			return ctrl.Result{}, err
+		}
+		logger.Info("Nginxdeployment not exist GetDeploymentFromFile")
 	} else if err != nil {
 		logger.Error(err, "Error getting existing Nginxdeployment.")
 		return ctrl.Result{}, err
@@ -78,17 +87,25 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	deployment.Namespace = req.Namespace
 	deployment.Name = req.Name
 	if operatorCR.Spec.Replicas != nil {
+		logger.Info("Set Replica")
 		deployment.Spec.Replicas = operatorCR.Spec.Replicas
 	}
 
 	if operatorCR.Spec.Port != nil {
-		deployment.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort = *operatorCR.Spec.Port
+		if len(deployment.Spec.Template.Spec.Containers[0].Ports) > 0 {
+			logger.Info("Set Port", "port", operatorCR.Spec.Port)
+			deployment.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort = *operatorCR.Spec.Port
+		}
 	}
 
+	logger.Info("Set Owner")
 	ctrl.SetControllerReference(operatorCR, deployment, r.Scheme)
+
 	if create {
+		logger.Info("Create Deployment", "deployment", deployment)
 		err = r.Create(ctx, deployment)
 	} else {
+		logger.Info("Update Deployment")
 		err = r.Update(ctx, deployment)
 	}
 
