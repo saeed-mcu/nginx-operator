@@ -8,3 +8,4 @@ metadata:
   namespace: nginx-operator-ns
 spec:
   port: 8585
+  replicas: 1

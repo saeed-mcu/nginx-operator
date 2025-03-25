@@ -111,3 +111,23 @@ Finally run:
 ```bash
 make manifest
 ```
+
+## STEP 5: Operator CRD conditions
+As part of the Kubernetes API conventions, objects (including custom resources) should
+include both a `spec` and `status` field. In the case of Operators, we are using `spec`
+as an **input for configuring the Operator's parameters** already.
+
+```go
+// NginxOperatorStatus defines the observed state of
+NginxOperator
+type NginxOperatorStatus struct {
+ // Conditions is the list of status condition updates
+ Conditions []metav1.Condition `json:"conditions"`
+}
+```
+Then, we will run `make generate` (to update the generated client code) and
+`make manifests` (to update the Operator's CRD with the new field),
+
+
+Now that the Operator's CRD has a field to report the latest status conditions, the code
+can be updated to implement them. For this, we can use the `SetStatusCondition()` helper function.
