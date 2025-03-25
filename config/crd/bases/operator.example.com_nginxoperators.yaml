@@ -45,6 +45,7 @@ spec:
                   instructs the Operator to redeploy the Operand
                 type: string
               port:
+                default: 8080
                 description: Port is the port number to expose on the Nginx Pod
                 format: int32
                 type: integer
@@ -52,6 +53,8 @@ spec:
                 description: Replicas is the number of deployment replicas to scale
                 format: int32
                 type: integer
+            required:
+            - port
             type: object
           status:
             description: NginxOperatorStatus defines the observed state of NginxOperator
