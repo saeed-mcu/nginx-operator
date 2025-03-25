@@ -5,7 +5,7 @@
 * An operator-sdk binary installed locally
 * Make sure your user is authorized with cluster-admin permissions.
 
-## STEP 1 : Setting up your project
+## Step 1 : Setting up your project
 
 First, create an empty project directory and cd into it.
 ```bash
@@ -24,7 +24,7 @@ operator-sdk init --domain example.com --repo github.com/saeed-mcu/nginx-operato
 `--domain` will be used as the prefix of the API group your custom resources will be created in. API groups are a mechanism to group portions of the Kubernetes API. API groups are used internally to version your Kubernetes resources and are thus used for many things. Importantly, you should name your domain to group your resource types in meaningful group(s) for ease of understanding and because these groups determine how access can be controlled to your resource types using RBAC.
 
 
-## STEP2: Defining an API
+## Step 2 : Defining an API
 The Operator's API will be the definition of how it is represented within a Kubernetes
 cluster. The API is directly translated to a generated CRD, which describes the blueprint
 for the custom resource object that users will consume to interact with the Operator.
@@ -41,3 +41,28 @@ This command does the following:
 4. Names these types after our Operator, `NginxOperator`
 5. Instantiates boilerplate controller code under a new directory called `controllers/`
 6. Updates main.go to add boilerplate code for starting the new controller
+
+## Step 3 : Modify Operator types
+Looking at nginxoperator_types.go, there are already some empty structs with instructions to fill in additional fields.
+The three most important types in this file are `NginxOperator`, `NginxOperatorSpec`, and `NginxOperatorStatus`:
+
+* `NginxOperatorSpec` defines the **desired state**
+* `NginxOperatorStatus` defines the **observed state**
+
+Modify  `NginxOperatorSpec` with your desired fields.
+```go
+type NginxOperatorSpec struct {
+	// Port is the port number to expose on the Nginx Pod
+	Port *int32 `json:"port,omitempty"`
+
+	// Replicas is the number of deployment replicas to scale
+	Replicas *int32 `json:"replicas,omitempty"`
+
+	// ForceRedploy is any string, modifying this field
+	// instructs the Operator to redeploy the Operand
+	ForceRedploy string `json:"forceRedploy,omitempty"`
+}
+```
+Once the Operator types have been modified, it is sometimes necessary to run `make generate` from the project root.
+This updates generated files, such as the zz_generated.deepcopy.go. It is good practice to develop the habit of
+regularly running this command whenever making changes to the API, even if it does not always produce any changes.
