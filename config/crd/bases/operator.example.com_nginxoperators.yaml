@@ -14,10 +14,19 @@ spec:
     singular: nginxoperator
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.replicas
+      name: Replicas
+      type: integer
+    - jsonPath: .spec.port
+      name: Port
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: NginxOperator is the Schema for the nginxoperators API
         properties:
           apiVersion:
             description: |-
@@ -122,5 +131,4 @@ spec:
         type: object
     served: true
     storage: true
-    subresources:
-      status: {}
+    subresources: {}

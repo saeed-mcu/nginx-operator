@@ -72,7 +72,7 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
 			Type:               "OperatorDegraded",
 			Status:             metav1.ConditionTrue,
-			Reason:             "OperatorResourceNotAvailable",
+			Reason:             operatorv1alpha1.ReasonDeploymentNotAvailable,
 			LastTransitionTime: metav1.NewTime(time.Now()),
 			Message:            fmt.Sprintf("unable to get operator custom resource: %s", err.Error()),
 		})
@@ -99,7 +99,7 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
 			Type:               "OperatorDegraded",
 			Status:             metav1.ConditionTrue,
-			Reason:             "OperandDeploymentNotAvailable",
+			Reason:             operatorv1alpha1.ReasonDeploymentNotAvailable,
 			LastTransitionTime: metav1.NewTime(time.Now()),
 			Message:            fmt.Sprintf("unable to get operand deployment: %s", err.Error()),
 		})
@@ -135,7 +135,7 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
 			Type:               "OperatorDegraded",
 			Status:             metav1.ConditionTrue,
-			Reason:             "OperandDeploymentFailed",
+			Reason:             operatorv1alpha1.ReasonOperandDeploymentFailed,
 			LastTransitionTime: metav1.NewTime(time.Now()),
 			Message:            fmt.Sprintf("unable to update operand deployment: %s", err.Error()),
 		})
@@ -145,7 +145,7 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
 		Type:               "OperatorDegraded",
 		Status:             metav1.ConditionFalse,
-		Reason:             "OperatorSucceeded",
+		Reason:             operatorv1alpha1.ReasonSucceeded,
 		LastTransitionTime: metav1.NewTime(time.Now()),
 		Message:            "operator successfully reconciling",
 	})
