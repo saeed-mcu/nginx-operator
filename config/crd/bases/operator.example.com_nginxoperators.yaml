@@ -27,6 +27,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
+        description: NginxOperator is the Schema for the nginxoperators API
         properties:
           apiVersion:
             description: |-
@@ -131,4 +132,5 @@ spec:
         type: object
     served: true
     storage: true
-    subresources: {}
+    subresources:
+      status: {}
